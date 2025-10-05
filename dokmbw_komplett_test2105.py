@@ -27,7 +27,11 @@ USERNAME = "itbg\\sp_farm"
 PASSWORT = "!DokM1MLcgi"
 EMAIL_PASSWORT = "quaSeu2i"
 ABSENDER = "ml-projekte-it@mail.de"
-EMPFAENGER = "c.mueller@mlgruppe.de, k.vosen@mlgruppe.de, r.panske@mlgruppe.de, a.borowczak@mlgruppe.de"
+EMPFAENGER = {"a.borowczak@mlgruppe.de",
+              "k.vossen@mlgruppe.de",
+              "c.mueller@mlgruppe.de",
+              "r.panske@mlgruppe.de",
+              "j.kujasch@mlgruppe.de"}
 SMTP_HOST = "smtp.mail.de"
 MAIL_BETREFF_VORLAGE = "{} Bewertung DokMBW"
 MAIL_TEXT = """Hallo zusammen,
@@ -38,6 +42,7 @@ diese Mail wurde Automatisiert versendet. Bitte nicht auf die Absenderadresse an
 Gruß
 Die Software von Andy
 """
+
 
 # ---------- HELPER ----------
 def get_value_from_rating(rating_str, label):
@@ -61,6 +66,7 @@ def get_value_from_rating(rating_str, label):
     match = re.search(fr"{re.escape(label)};#(\d+)#", rating_str)
     return int(match.group(1)) if match else None
 
+
 def extract_block(description_raw, label):
     """
     Extracts and cleans a specific labeled block of text from a raw HTML-like description.
@@ -81,8 +87,9 @@ def extract_block(description_raw, label):
         label. Returns an empty string if no matching block is found.
     :rtype: str
     """
-    match = re.search(fr"<b>{label}:</b>(.*?)</div>", description_raw.replace("\n", ""))
+    match = re.search(fr"<b>{re.escape(label)}:</b>\s*(.*?)</div>", description_raw.replace("\n", ""))
     return re.sub(r"<.*?>", "", match.group(1).strip()) if match else ""
+
 
 def berechne_speicherpfad(dateiname: str):
     """
@@ -102,6 +109,7 @@ def berechne_speicherpfad(dateiname: str):
     kw_ordner.mkdir(parents=True, exist_ok=True)
     return kw_ordner / dateiname
 
+
 # ---------- CONVERTER ----------
 def convert_xml_to_excel(xml_file_path, output_excel_path):
     """
@@ -118,6 +126,7 @@ def convert_xml_to_excel(xml_file_path, output_excel_path):
     :type output_excel_path: str
     :return: None
     """
+
     def get_value_from_rating(rating_str, label):
         """
         Converts an XML file to an Excel file.
@@ -147,7 +156,7 @@ def convert_xml_to_excel(xml_file_path, output_excel_path):
         :param output_excel_path: Path where the resulting Excel file will be saved.
         :type output_excel_path: str
         """
-        match = re.search(fr"<b>{label}:</b>(.*?)</div>", description_raw.replace("\n", ""))
+        match = re.search(fr"<b>{re.escape(label)}:</b>\s*(.*?)</div>", description_raw.replace("\n", ""))
         return re.sub(r"<.*?>", "", match.group(1).strip()) if match else ""
 
     tree = ET.parse(xml_file_path)
@@ -167,7 +176,8 @@ def convert_xml_to_excel(xml_file_path, output_excel_path):
         ende = extract_block(description_raw, "Schulungszeitraum (Ende)")
         trainer = extract_block(description_raw, "Name des Trainers")
         themen = extract_block(description_raw, "Folgende Themen haben mich besonders interessiert:")
-        zu_kurz = extract_block(description_raw, "Diese Themen kamen meiner Meinung nach zu kurz/habe ich nicht verstanden:")
+        zu_kurz = extract_block(description_raw,
+                                "Diese Themen kamen meiner Meinung nach zu kurz/habe ich nicht verstanden:")
         bewertung = extract_block(description_raw, "Lehrgangsbewertung")
         zufriedenheit = extract_block(description_raw, "Zufriedenheit")
         vorschlaege = extract_block(description_raw, "Haben Sie noch Wünsche, Vorschläge, Anregungen?")
@@ -182,15 +192,23 @@ def convert_xml_to_excel(xml_file_path, output_excel_path):
             "Folgende Themen haben mich besonders interessiert:": themen,
             "Diese Themen kamen meiner Meinung nach zu kurz/habe ich nicht verstanden:": zu_kurz,
             "Haben Sie noch Wünsche, Vorschläge, Anregungen?": vorschlaege,
-            "Zufriedenheit_Ich würde das Seminar weiterempfehlen": get_value_from_rating(zufriedenheit, "Ich würde das Seminar weiterempfehlen"),
-            "Zufriedenheit_Zufriedenheit mit Seminar": get_value_from_rating(zufriedenheit, "Zufriedenheit mit Seminar"),
-            "Zufriedenheit_Zufriedenheit mit Trainer/in": get_value_from_rating(zufriedenheit, "Zufriedenheit mit Trainer/in"),
+            "Zufriedenheit_Ich würde das Seminar weiterempfehlen": get_value_from_rating(zufriedenheit,
+                                                                                         "Ich würde das Seminar weiterempfehlen"),
+            "Zufriedenheit_Zufriedenheit mit Seminar": get_value_from_rating(zufriedenheit,
+                                                                             "Zufriedenheit mit Seminar"),
+            "Zufriedenheit_Zufriedenheit mit Trainer/in": get_value_from_rating(zufriedenheit,
+                                                                                "Zufriedenheit mit Trainer/in"),
             "Lehrgangsbewertung_Teilnehmerunterlagen": get_value_from_rating(bewertung, "Teilnehmerunterlagen"),
-            "Lehrgangsbewertung_Praxisanteil des Seminars (erster Eindruck)": get_value_from_rating(bewertung, "Praxisanteil des Seminars (erster Eindruck)"),
-            "Lehrgangsbewertung_Präsentation der Inhalte (Nachvollziehbarkeit)": get_value_from_rating(bewertung, "Präsentation der Inhalte (Nachvollziehbarkeit)"),
-            "Lehrgangsbewertung_Durchführung durch Trainer/in (Methodisch)": get_value_from_rating(bewertung, "Durchführung durch Trainer/in (Methodisch)"),
-            "Lehrgangsbewertung_Durchführung durch Trainer/in (Fachlich)": get_value_from_rating(bewertung, "Durchführung durch Trainer/in (Fachlich)"),
-            "Lehrgangsbewertung_Struktur des Seminars (Roter Faden)": get_value_from_rating(bewertung, "Struktur des Seminars (Roter Faden)"),
+            "Lehrgangsbewertung_Praxisanteil des Seminars (erster Eindruck)": get_value_from_rating(bewertung,
+                                                                                                    "Praxisanteil des Seminars (erster Eindruck)"),
+            "Lehrgangsbewertung_Präsentation der Inhalte (Nachvollziehbarkeit)": get_value_from_rating(bewertung,
+                                                                                                       "Präsentation der Inhalte (Nachvollziehbarkeit)"),
+            "Lehrgangsbewertung_Durchführung durch Trainer/in (Methodisch)": get_value_from_rating(bewertung,
+                                                                                                   "Durchführung durch Trainer/in (Methodisch)"),
+            "Lehrgangsbewertung_Durchführung durch Trainer/in (Fachlich)": get_value_from_rating(bewertung,
+                                                                                                 "Durchführung durch Trainer/in (Fachlich)"),
+            "Lehrgangsbewertung_Struktur des Seminars (Roter Faden)": get_value_from_rating(bewertung,
+                                                                                            "Struktur des Seminars (Roter Faden)"),
             "Lehrgangsbewertung_Allgemeine Atmosphäre": get_value_from_rating(bewertung, "Allgemeine Atmosphäre"),
             "Elementtyp": "Element",
             "Pfad": ""
@@ -221,6 +239,8 @@ def convert_xml_to_excel(xml_file_path, output_excel_path):
 
     ws.auto_filter.ref = ws.dimensions
     wb.save(output_excel_path)
+
+
 # ---------- RSS FEED ----------
 class LegacySSLAdapter(HTTPAdapter):
     def init_poolmanager(self, *args, **kwargs):
@@ -230,6 +250,7 @@ class LegacySSLAdapter(HTTPAdapter):
         ctx.verify_mode = ssl.CERT_NONE
         kwargs["ssl_context"] = ctx
         self.poolmanager = PoolManager(*args, **kwargs)
+
 
 def download_rss_and_save_xml(server_num):
     server_prefix = f"{int(server_num):02}"
@@ -279,6 +300,7 @@ def download_rss_and_save_xml(server_num):
     except Exception as e:
         raise Exception(f"[{server_prefix}] Fehler: {e}")
 
+
 # ---------- MAIL ----------
 def sende_auswertung_per_mail(excel_dateien, empfaenger):
     datum = datetime.now().strftime("%d.%m.%Y")
@@ -307,6 +329,7 @@ def sende_auswertung_per_mail(excel_dateien, empfaenger):
     except Exception as e:
         print(f"❌ Fehler beim Senden an {empfaenger}: {e}")
 
+
 # ---------- GUI ----------
 
 
@@ -323,11 +346,36 @@ def run_gui_process(server_list, versand_aktiv):
     else:
         zielordner = None
 
+    def get_anwender_kuerzel(seminar_titel):
+        """
+        Konvertiert Seminartitel zu Anwender-Kürzeln
+        """
+        kuerzel_mapping = {
+            "Anwender-Schulung": "AN",
+            "Assistent": "AA", 
+            "Löschberechtigter": "LOEBE",
+            "Registrator": "REG"
+        }
+        
+        for titel, kuerzel in kuerzel_mapping.items():
+            if titel.lower() in seminar_titel.lower():
+                return kuerzel
+        return "UNBEKANNT"
+
     for server in server_list:
         try:
             result = download_rss_and_save_xml(server)
-            datum = datetime.now().strftime("%d%m%Y")
-            dateiname = f"{datum}_{result['server']}_{result['trainer']}.xlsx"
+            
+            # XML parsen um Seminar-Titel zu extrahieren
+            root = ET.parse(result["xml_file"]).getroot()
+            channel = root.find("channel")
+            first_item = channel.find("item")
+            description_raw = first_item.find("description").text
+            seminar_titel = extract_block(description_raw, "Titel des Seminars")
+            
+            datum = datetime.now().strftime("%Y%m%d")
+            anwender_kuerzel = get_anwender_kuerzel(seminar_titel)
+            dateiname = f"{datum}-{anwender_kuerzel}-{result['trainer']}.xlsx"
             if versand_aktiv:
                 zielpfad = berechne_speicherpfad(dateiname)
             else:
@@ -346,6 +394,7 @@ def run_gui_process(server_list, versand_aktiv):
     else:
         messagebox.showerror("Fehler", "\n".join(fehler))
 
+
 def start_gui():
     root = tk.Tk()
     root.title("DokMBW Serverauswahl")
@@ -359,7 +408,8 @@ def start_gui():
         tk.Checkbutton(root, text=f"{i:02}", variable=var).pack(anchor="w")
         vars.append((i, var))
 
-    tk.Radiobutton(root, text="Versand aktiv (Online-Schulung)", variable=versand_var, value=1).pack(anchor="w", pady=(10, 0))
+    tk.Radiobutton(root, text="Versand aktiv (Online-Schulung)", variable=versand_var, value=1).pack(anchor="w",
+                                                                                                     pady=(10, 0))
     tk.Radiobutton(root, text="Nur speichern (Präsenzschulung)", variable=versand_var, value=0).pack(anchor="w")
 
     def starten():
@@ -371,5 +421,7 @@ def start_gui():
 
     tk.Button(root, text="Auswertung starten", command=starten).pack(pady=10)
     root.mainloop()
+
+
 if __name__ == "__main__":
     start_gui()
