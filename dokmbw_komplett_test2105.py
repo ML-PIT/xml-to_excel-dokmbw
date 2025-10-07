@@ -28,7 +28,7 @@ PASSWORT = "!DokM1MLcgi"
 EMAIL_PASSWORT = "quaSeu2i"
 ABSENDER = "ml-projekte-it@mail.de"
 EMPFAENGER = {"a.borowczak@mlgruppe.de",
-              "k.vossen@mlgruppe.de",
+              "k.vosen@mlgruppe.de",
               "c.mueller@mlgruppe.de",
               "r.panske@mlgruppe.de",
               "j.kujasch@mlgruppe.de"}
