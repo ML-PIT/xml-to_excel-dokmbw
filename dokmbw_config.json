@@ -1,0 +1,39 @@
+{
+    "username": "itbg\\sp_farm",
+    "password": "!DokM1MLcgi",
+    "email_password": "quaSeu2i",
+    "absender": "ml-projekte-it@mail.de",
+    "empfaenger": [
+        "a.borowczak@mlgruppe.de",
+        "k.vosen@mlgruppe.de",
+        "c.mueller@mlgruppe.de",
+        "r.panske@mlgruppe.de",
+        "j.kujasch@mlgruppe.de"
+    ],
+    "smtp_host": "smtp.mail.de",
+    "mail_betreff": "{} Bewertung DokMBW",
+    "mail_text": "Hallo zusammen,\n\ndiese Mail wurde Automatisiert versendet. Bitte nicht auf die Absenderadresse antworten.\n\n\nGruß\nDie Software von Andy",
+    "abruf_zeit": "16:30",
+    "server_wochentage": {
+        "2": [
+            0,
+            1,
+            2,
+            3
+        ],
+        "4": [
+            4
+        ]
+    },
+    "server_abruf_zeiten": {
+        "2": "16:10",
+        "4": "11:20"
+    },
+    "kuerzel_mapping": {
+        "Anwender-Schulung": "AN",
+        "Assistent": "AA",
+        "Löschberechtigter": "LOEBE",
+        "Registrator": "REG",
+        "Anwendungsmanager": "AM"
+    }
+}
