@@ -355,7 +355,8 @@ def run_automatic_process():
             "Anwender-Schulung": "AN",
             "Assistent": "AA", 
             "Löschberechtigter": "LOEBE",
-            "Registrator": "REG"
+            "Registrator": "REG",
+            "Anwendungsmanager": "AM"
         }
         
         for titel, kuerzel in kuerzel_mapping.items():
@@ -451,7 +452,8 @@ def run_gui_process(server_list, versand_aktiv):
             "Anwender-Schulung": "AN",
             "Assistent": "AA", 
             "Löschberechtigter": "LOEBE",
-            "Registrator": "REG"
+            "Registrator": "REG",
+            "Anwendungsmanager": "AM"
         }
         
         for titel, kuerzel in kuerzel_mapping.items():
